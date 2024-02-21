@@ -8,7 +8,7 @@ from tensorflow.keras.metrics import SparseCategoricalAccuracy
 from tensorflow.keras.callbacks import EarlyStopping
 
 def transformer_model(input_vocab_size, target_vocab_size, max_sequence_length, d_model=128, num_heads=4, num_encoder_layers=4, num_decoder_layers=4, dff=512, dropout_rate=0.1):
-    batch_size = 32  # 원하는 배치 크기 설정
+    batch_size = 32
     encoder_input = Input(shape=(max_sequence_length,), dtype=tf.int32, name='encoder_input')
     encoder_input_expanded = tf.repeat(encoder_input, repeats=batch_size, axis=0)
     encoder_embedding = tf.keras.layers.Embedding(input_vocab_size, d_model)(encoder_input_expanded)
@@ -24,7 +24,6 @@ def transformer_model(input_vocab_size, target_vocab_size, max_sequence_length, 
 
     output = Dense(target_vocab_size, activation='softmax')(decoder_output)
 
-    # Model
     model = transformer_model(input_vocab_size, target_vocab_size, max_sequence_length, encoder_input=encoder_input_expanded)
     return model
 
@@ -59,15 +58,11 @@ def create_look_ahead_mask(size):
     mask = 1 - tf.linalg.band_part(tf.ones((size, size)), -1, 0)
     return mask
 
-# 모델 생성
-
 input_vocab_size = 15
 target_vocab_size = 15
 max_sequence_length = 30
 model = transformer_model(input_vocab_size, target_vocab_size, max_sequence_length)
 
-# 모델 컴파일
 model.compile(optimizer=Adam(), loss=SparseCategoricalCrossentropy(), metrics=[SparseCategoricalAccuracy()])
 
-# 모델 구조 확인
 model.summary()
